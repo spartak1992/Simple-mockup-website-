@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameGate - Age Verified Gaming Platform</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #ecf0f1;
+            --text-color: #333;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Header Styling */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .game-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .game-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .game-card .game-info {
+            padding: 15px;
+        }
+        .locked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        /* Spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">GameGate</div>
+            <nav>
+                <a href="#">Home</a>
+                <a href="#">Games</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="game-grid">
+            <!-- Game 1: Accessible Game -->
+            <div class="game-card">
+                <img src="/api/placeholder/400/200" alt="Game 1">
+                <div class="game-info">
+                    <h3>Fantasy Adventure</h3>
+                    <button class="btn">Play Now</button>
+                </div>
+            </div>
+
+            <!-- Game 2: Accessible Game -->
+            <div class="game-card">
+                <img src="/api/placeholder/400/200" alt="Game 2">
+                <div class="game-info">
+                    <h3>Racing Simulator</h3>
+                    <button class="btn">Play Now</button>
+                </div>
+            </div>
+
+            <!-- Game 3: Locked Game -->
+            <div class="game-card">
+                <img src="/api/placeholder/400/200" alt="Game 3">
+                <div class="game-info">
+                    <h3>Mature Rated Game</h3>
+                    <div class="locked-overlay">
+                        <h4>18+ Restricted</h4>
+                        <button id="verify-age-btn" class="btn">Verify Your Age</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet Connection Modal -->
+    <div id="wallet-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Verify Your Age</h2>
+            <p>Connect your wallet to verify you are 18+</p>
+            <div>
+                <button id="metamask-btn" class="btn">Connect MetaMask</button>
+                <button id="walletconnect-btn" class="btn">WalletConnect</button>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.8rem;">
+                Ensure your wallet supports DID credentials
+            </p>
+        </div>
+    </div>
+
+    <!-- Message Signature Modal -->
+    <div id="signature-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Sign Verification Message</h2>
+            <div style="background-color: #f4f4f4; padding: 15px; margin: 20px 0; border-radius: 5px;">
+                <p>Verification Message:</p>
+                <p><strong>I confirm that I am 18 years or older and authorize age verification for GameGate.</strong></p>
+                <p>Nonce: 0x1a2b3c4d5e6f</p>
+            </div>
+            <button id="sign-message-btn" class="btn">Sign Message in MetaMask</button>
+            <p class="warning" style="color: #e74c3c; margin-top: 15px;">
+                Please carefully review the message before signing.
+            </p>
+        </div>
+    </div>
+
+    <!-- Verification Loading Modal -->
+    <div id="loading-modal" class="modal">
+        <div class="modal-content">
+            <h2>Verifying Your Credentials</h2>
+            <div class="spinner"></div>
+            <p>Checking your age verification NFT...</p>
+        </div>
+    </div>
+
+    <!-- Verification Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <div style="color: #2ecc71; font-size: 72px; margin-bottom: 20px;">✓</div>
+            <h2>Age Verification Successful</h2>
+            <p>Your age has been verified! You now have access to all games.</p>
+            <button id="explore-games-btn" class="btn">Explore Games</button>
+        </div>
+    </div>
+
+    <!-- Verification Failure Modal -->
+    <div id="failure-modal" class="modal">
+        <div class="modal-content">
+            <div style="color: #e74c3c; font-size: 72px; margin-bottom: 20px;">✗</div>
+            <h2>Age Verification Failed</h2>
+            <p>We couldn't verify your age using the provided wallet.</p>
+            <div>
+                <button id="retry-btn" class="btn">Retry Verification</button>
+                <button id="support-btn" class="btn">Contact Support</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal Utility Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside or on close button
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this || e.target.classList.contains('modal-close')) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+
+        // Event Listeners
+        document.getElementById('verify-age-btn').addEventListener('click', () => {
+            openModal('wallet-modal');
+        });
+
+        document.getElementById('metamask-btn').addEventListener('click', () => {
+            closeModal('wallet-modal');
+            openModal('signature-modal');
+        });
+
+        document.getElementById('sign-message-btn').addEventListener('click', () => {
+            closeModal('signature-modal');
+            openModal('loading-modal');
+            
+            // Simulate verification process
+            setTimeout(() => {
+                closeModal('loading-modal');
+                openModal('success-modal');
+            }, 2000);
+        });
+
+        document.getElementById('explore-games-btn').addEventListener('click', () => {
+            closeModal('success-modal');
+        });
+
+        document.getElementById('retry-btn').addEventListener('click', () => {
+            closeModal('failure-modal');
+            openModal('wallet-modal');
+        });
+
+        document.getElementById('support-btn').addEventListener('click', () => {
+            alert('Support contact: support@gamegate.com');
+        });
+    </script>
+</body>
+</html>
